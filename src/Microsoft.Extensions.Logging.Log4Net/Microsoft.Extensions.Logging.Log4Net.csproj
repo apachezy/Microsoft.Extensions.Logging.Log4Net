@@ -10,12 +10,12 @@
 		<Company></Company>
 		<Product>Microsoft.Extensions.Logging.Log4Net</Product>
 		<Description>
-			Allows to configure Log4net as Microsoft Extensions Logging handler on any ASP.NET Core application.
+            A log4net logging provider for Microsoft.Extensions.Logging, compatible with .NET Standard, .NET Framework, and modern .NET applications.
 
-			Original code proposal by @anuraj --&gt; https://dotnetthoughts.net/how-to-use-log4net-with-aspnetcore-for-logging/
+            Original code proposal by @anuraj --&gt; https://dotnetthoughts.net/how-to-use-log4net-with-aspnetcore-for-logging/
 		</Description>
 		<Copyright></Copyright>
-		<PackageTags>Microsoft Extensions Logging Log4Net AspNet Core</PackageTags>
+		<PackageTags>Microsoft Extensions Logging Log4Net</PackageTags>
 		<RootNamespace>Microsoft.Extensions.Logging.Log4Net</RootNamespace>
 		<AssemblyName>Microsoft.Extensions.Logging.Log4Net</AssemblyName>
 		<PackageReleaseNotes>
