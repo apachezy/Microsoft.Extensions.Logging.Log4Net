@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netcoreapp3.1;netstandard2.0;netstandard2.1;net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
 	</PropertyGroup>
 	<PropertyGroup>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-		<PackageId>Microsoft.Extensions.Logging.Log4Net.AspNetCore</PackageId>
+		<PackageId>Microsoft.Extensions.Logging.Log4Net</PackageId>
 		<Authors>Huor Swords</Authors>
 		<Company></Company>
-		<Product>Microsoft.Extensions.Logging.Log4Net.AspNetCore</Product>
+		<Product>Microsoft.Extensions.Logging.Log4Net</Product>
 		<Description>
 			Allows to configure Log4net as Microsoft Extensions Logging handler on any ASP.NET Core application.
 
@@ -16,8 +16,8 @@
 		</Description>
 		<Copyright></Copyright>
 		<PackageTags>Microsoft Extensions Logging Log4Net AspNet Core</PackageTags>
-		<RootNamespace>Microsoft.Extensions.Logging.Log4Net.AspNetCore</RootNamespace>
-		<AssemblyName>Microsoft.Extensions.Logging.Log4Net.AspNetCore</AssemblyName>
+		<RootNamespace>Microsoft.Extensions.Logging.Log4Net</RootNamespace>
+		<AssemblyName>Microsoft.Extensions.Logging.Log4Net</AssemblyName>
 		<PackageReleaseNotes>
 			#133 - Compatible with .NET 8.0
 		</PackageReleaseNotes>
@@ -36,15 +36,16 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="8.0.0" PrivateAssets="All" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-		<PackageReference Include="log4net" Version="2.0.15" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.5" />
+		<PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="10.0.201" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.201" PrivateAssets="All" />
+		<PackageReference Include="log4net" Version="3.3.0" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.4" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.5" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
