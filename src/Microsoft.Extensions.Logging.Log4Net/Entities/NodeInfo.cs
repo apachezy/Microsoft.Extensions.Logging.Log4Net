@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Microsoft.Extensions.Logging.Log4Net.AspNetCore.Entities
+namespace Microsoft.Extensions.Logging.Log4Net.Entities
 {
     /// <summary>
     ///  Class to store information of a log4net xml config file node.

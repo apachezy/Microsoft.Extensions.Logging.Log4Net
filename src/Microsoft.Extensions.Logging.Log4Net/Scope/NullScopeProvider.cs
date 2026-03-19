@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Microsoft.Extensions.Logging.Log4Net.AspNetCore.Scope
+namespace Microsoft.Extensions.Logging.Log4Net.Scope
 {
     /// <summary>
     /// A <see cref="IExternalScopeProvider"/> that will not save nor return scopes.

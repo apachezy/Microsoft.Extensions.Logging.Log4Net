@@ -1,49 +1,58 @@
-﻿using log4net;
+﻿using System;
+using log4net;
 using log4net.Core;
-using Microsoft.Extensions.Logging.Log4Net.AspNetCore.Entities;
-using System;
+using Microsoft.Extensions.Logging.Log4Net.Entities;
 
-namespace Microsoft.Extensions.Logging
+namespace Microsoft.Extensions.Logging.Log4Net
 {
     /// <summary>
     /// The log4net logger class.
     /// </summary>
     public class Log4NetLogger : ILogger
     {
-        private readonly IExternalScopeProvider externalScopeProvider;
+        private readonly IExternalScopeProvider _externalScopeProvider;
 
         /// <summary>
         /// The log.
         /// </summary>
-        private readonly log4net.Core.ILogger logger;
+        private readonly log4net.Core.ILogger _logger;
 
         /// <summary>
         /// The provider options.
         /// </summary>
-        private readonly Log4NetProviderOptions options;
+        private readonly Log4NetProviderOptions _options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Log4NetLogger"/> class.
         /// </summary>
-        /// <param name="options">The log4net provider options.</param>
+        /// <param name="options">
+        /// The <see cref="Log4NetProviderOptions"/> used to configure the log4net logger,
+        /// including repository and logger name settings.
+        /// </param>
+        /// <param name="externalScopeProvider">
+        /// The <see cref="IExternalScopeProvider"/> used to access the current logging scopes.
+        /// <para/>
+        /// This provider enables integration with the <c>Microsoft.Extensions.Logging</c> scope system
+        /// (for example, values created via <c>ILogger.BeginScope</c>), allowing scope data to be
+        /// included in log4net log events.
+        /// </param>
         public Log4NetLogger(Log4NetProviderOptions options, IExternalScopeProvider externalScopeProvider)
         {
-            this.options = options ?? throw new ArgumentNullException(nameof(options));
-            this.externalScopeProvider = externalScopeProvider ?? throw new ArgumentNullException(nameof(externalScopeProvider));
-            this.logger = LogManager.GetLogger(options.LoggerRepository, options.Name).Logger;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _externalScopeProvider = externalScopeProvider ?? throw new ArgumentNullException(nameof(externalScopeProvider));
+            _logger = LogManager.GetLogger(options.LoggerRepository, options.Name).Logger;
         }
 
         /// <summary>
         /// Gets the name.
         /// </summary>
-        public string Name
-            => this.logger.Name;
+        public string Name => _logger.Name;
 
         /// <summary>
         /// A get-only property for accessing the <see cref="Log4NetProviderOptions"/>
         /// within the instance.
         /// </summary>
-        internal Log4NetProviderOptions Options => this.options;
+        internal Log4NetProviderOptions Options => _options;
 
 
         /// <summary>
@@ -55,7 +64,9 @@ namespace Microsoft.Extensions.Logging
         /// An IDisposable that ends the logical operation scope on dispose.
         /// </returns>
         public IDisposable BeginScope<TState>(TState state)
-            => externalScopeProvider.Push(state);
+        {
+            return _externalScopeProvider.Push(state);
+        }
 
         /// <summary>
         /// Determines whether the logging level is enabled.
@@ -65,10 +76,10 @@ namespace Microsoft.Extensions.Logging
         /// <exception cref="ArgumentOutOfRangeException">Throws when <paramref name="logLevel"/> is outside allowed range.</exception>
         public bool IsEnabled(LogLevel logLevel)
         {
-            Level translatedLogLevel = this.options.LogLevelTranslator.TranslateLogLevel(logLevel, Options);
+            Level translatedLogLevel = _options.LogLevelTranslator.TranslateLogLevel(logLevel, Options);
             if (translatedLogLevel != null)
             {
-                return this.logger.IsEnabledFor(translatedLogLevel);
+                return _logger.IsEnabledFor(translatedLogLevel);
             }
 
             if (logLevel == LogLevel.None)
@@ -105,12 +116,12 @@ namespace Microsoft.Extensions.Logging
 
             var candidate = new MessageCandidate<TState>(logLevel, eventId, state, exception, formatter);
 
-            LoggingEvent loggingEvent = options.LoggingEventFactory.CreateLoggingEvent(in candidate, logger, options, externalScopeProvider);
+            var loggingEvent = _options.LoggingEventFactory.CreateLoggingEvent(in candidate, _logger, _options, _externalScopeProvider);
 
             if (loggingEvent == null)
                 return;
 
-            this.logger.Log(loggingEvent);
+            _logger.Log(loggingEvent);
         }
 
         private static void EnsureValidFormatter<TState>(Func<TState, Exception, string> formatter)

@@ -1,10 +1,4 @@
-﻿using log4net;
-using log4net.Config;
-using log4net.Repository;
-using Microsoft.Extensions.Logging.Log4Net.AspNetCore.Entities;
-using Microsoft.Extensions.Logging.Log4Net.AspNetCore.Extensions;
-using Microsoft.Extensions.Logging.Log4Net.AspNetCore.Scope;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -13,8 +7,14 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using log4net;
+using log4net.Config;
+using log4net.Repository;
+using Microsoft.Extensions.Logging.Log4Net.Entities;
+using Microsoft.Extensions.Logging.Log4Net.Extensions;
+using Microsoft.Extensions.Logging.Log4Net.Scope;
 
-namespace Microsoft.Extensions.Logging
+namespace Microsoft.Extensions.Logging.Log4Net
 {
     /// <summary>
     /// The log4net provider class.
@@ -25,22 +25,22 @@ namespace Microsoft.Extensions.Logging
         /// <summary>
         /// The loggers collection.
         /// </summary>
-        private readonly ConcurrentDictionary<string, Log4NetLogger> loggers = new ConcurrentDictionary<string, Log4NetLogger>();
+        private readonly ConcurrentDictionary<string, Log4NetLogger> _loggers = new ConcurrentDictionary<string, Log4NetLogger>();
 
         /// <summary>
         /// Prevents to dispose the object more than single time.
         /// </summary>
-        private bool disposedValue = false;
+        private bool _disposedValue;
 
         /// <summary>
         /// The log4net repository.
         /// </summary>
-        private ILoggerRepository loggerRepository;
+        private ILoggerRepository _loggerRepository;
 
         /// <summary>
         /// The provider options.
         /// </summary>
-        private Log4NetProviderOptions options;
+        private Log4NetProviderOptions _options;
 
         /// <summary>
         /// The external logging scope provider.
@@ -77,11 +77,11 @@ namespace Microsoft.Extensions.Logging
         /// <exception cref="NotSupportedException">Wach cannot be true when you are overwriting config file values with values from configuration section.</exception>
         public Log4NetProvider(Log4NetProviderOptions options)
         {
-            this.SetOptionsIfValid(options);
+            SetOptionsIfValid(options);
 
-            Assembly loggingAssembly = GetLoggingReferenceAssembly();
+            var loggingAssembly = GetLoggingReferenceAssembly();
 
-            this.CreateLoggerRepository(loggingAssembly)
+            CreateLoggerRepository(loggingAssembly)
                 .ConfigureLog4NetLibrary(loggingAssembly);
         }
 
@@ -98,7 +98,9 @@ namespace Microsoft.Extensions.Logging
         /// </summary>
         /// <returns>An instance of the <see cref="ILogger"/>.</returns>
         public ILogger CreateLogger()
-            => this.CreateLogger(this.options.Name);
+        {
+            return CreateLogger(_options.Name);
+        }
 
         /// <summary>
         /// Creates the logger.
@@ -106,14 +108,16 @@ namespace Microsoft.Extensions.Logging
         /// <param name="categoryName">The category name.</param>
         /// <returns>An instance of the <see cref="ILogger"/>.</returns>
         public ILogger CreateLogger(string categoryName)
-            => this.loggers.GetOrAdd(categoryName, this.CreateLoggerImplementation);
+        {
+            return _loggers.GetOrAdd(categoryName, CreateLoggerImplementation);
+        }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -123,15 +127,15 @@ namespace Microsoft.Extensions.Logging
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
-                    this.loggerRepository.Shutdown();
-                    this.loggers.Clear();
+                    _loggerRepository.Shutdown();
+                    _loggers.Clear();
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
@@ -199,7 +203,7 @@ namespace Microsoft.Extensions.Logging
         /// <returns>The <see cref="XmlElement"/> with the log4net XML element.</returns>
         private static XmlDocument ParseLog4NetConfigFile(string filename)
         {
-            using (FileStream stream = File.OpenRead(filename))
+            using (var stream = File.OpenRead(filename))
             {
                 var settings = new XmlReaderSettings
                 {
@@ -224,7 +228,7 @@ namespace Microsoft.Extensions.Logging
         {
             var stackTrace = new System.Diagnostics.StackTrace(2);
 
-            for (int i = 0; i < stackTrace.FrameCount; i++)
+            for (var i = 0; i < stackTrace.FrameCount; i++)
             {
                 var frame = stackTrace.GetFrame(i);
                 var type = frame.GetMethod()?.DeclaringType;
@@ -248,10 +252,10 @@ namespace Microsoft.Extensions.Logging
             var loggerOptions = new Log4NetProviderOptions
             {
                 Name = name,
-                LoggerRepository = this.loggerRepository.Name,
-                OverrideCriticalLevelWith = this.options.OverrideCriticalLevelWith,
-                LoggingEventFactory = this.options.LoggingEventFactory ?? new Log4NetLoggingEventFactory(),
-                LogLevelTranslator = this.options.LogLevelTranslator ?? new Log4NetLogLevelTranslator(),
+                LoggerRepository = _loggerRepository.Name,
+                OverrideCriticalLevelWith = _options.OverrideCriticalLevelWith,
+                LoggingEventFactory = _options.LoggingEventFactory ?? new Log4NetLoggingEventFactory(),
+                LogLevelTranslator = _options.LogLevelTranslator ?? new Log4NetLogLevelTranslator(),
             };
 
             return new Log4NetLogger(loggerOptions, ExternalScopeProvider);
@@ -263,9 +267,7 @@ namespace Microsoft.Extensions.Logging
         /// <returns>The assembly to be used as the reference logging assembly.</returns>
         private static Assembly GetLoggingReferenceAssembly()
         {
-            Assembly assembly = null;
-
-            assembly = Assembly.GetExecutingAssembly();
+            var assembly = Assembly.GetExecutingAssembly();
 
             return assembly ?? GetCallingAssemblyFromStartup();
         }
@@ -293,7 +295,7 @@ namespace Microsoft.Extensions.Logging
                 throw new NotSupportedException("Wach cannot be true when you are overwriting config file values with values from configuration section.");
             }
 
-            this.options = options;
+            _options = options;
         }
 
         /// <summary>
@@ -302,33 +304,33 @@ namespace Microsoft.Extensions.Logging
         /// <param name="assembly">The assembly to be used on the configuration.</param>
         private Log4NetProvider ConfigureLog4NetLibrary(Assembly assembly)
         {
-            if (this.options.UseWebOrAppConfig)
+            if (_options.UseWebOrAppConfig)
             {
-                XmlConfigurator.Configure(this.loggerRepository);
+                XmlConfigurator.Configure(_loggerRepository);
                 return this;
             }
 
-            if (!this.options.ExternalConfigurationSetup)
+            if (!_options.ExternalConfigurationSetup)
             {
-                string fileNamePath = CreateLog4NetFilePath(assembly);
-                if (this.options.Watch)
+                var fileNamePath = CreateLog4NetFilePath(assembly);
+                if (_options.Watch)
                 {
                     XmlConfigurator.ConfigureAndWatch(
-                        this.loggerRepository,
+                        _loggerRepository,
                         new FileInfo(fileNamePath));
                 }
                 else
                 {
                     var configXml = ParseLog4NetConfigFile(fileNamePath);
-                    if (this.options.PropertyOverrides != null
-                        && this.options.PropertyOverrides.Any())
+                    if (_options.PropertyOverrides != null
+                        && _options.PropertyOverrides.Any())
                     {
                         configXml = UpdateNodesWithOverridingValues(
                             configXml,
-                            this.options.PropertyOverrides);
-                    }
+                            _options.PropertyOverrides);
+                    } 
 
-                    XmlConfigurator.Configure(this.loggerRepository, configXml.DocumentElement);
+                    XmlConfigurator.Configure(_loggerRepository, configXml.DocumentElement);
                 }
             }
 
@@ -342,7 +344,7 @@ namespace Microsoft.Extensions.Logging
         /// <returns>The full path to the log4net.config file.</returns>
         private string CreateLog4NetFilePath(Assembly assembly)
         {
-            string fileNamePath = this.options.Log4NetConfigFileName;
+            var fileNamePath = _options.Log4NetConfigFileName;
             if (!Path.IsPathRooted(fileNamePath))
             {
                 fileNamePath = Path.Combine(AppContext.BaseDirectory, fileNamePath);
@@ -357,14 +359,14 @@ namespace Microsoft.Extensions.Logging
         /// <param name="assembly">The assembly to be used to create de repository.</param>
         private Log4NetProvider CreateLoggerRepository(Assembly assembly)
         {
-            Type repositoryType = typeof(log4net.Repository.Hierarchy.Hierarchy);
+            var repositoryType = typeof(log4net.Repository.Hierarchy.Hierarchy);
 
-            if (!string.IsNullOrEmpty(this.options.LoggerRepository))
+            if (!string.IsNullOrEmpty(_options.LoggerRepository))
             {
                 try
                 {
-                    this.loggerRepository = LogManager.GetRepository(this.options.LoggerRepository);
-                    if (this.options.ExternalConfigurationSetup)
+                    _loggerRepository = LogManager.GetRepository(_options.LoggerRepository);
+                    if (_options.ExternalConfigurationSetup)
                     {
                         // The logger repository is already configured. We can exit here.
                         return this;
@@ -373,18 +375,18 @@ namespace Microsoft.Extensions.Logging
                 catch (log4net.Core.LogException)
                 {
                     // The logger repository is not defined outside the extension.
-                    this.loggerRepository = null;
+                    _loggerRepository = null;
                 }
 
-                if (this.loggerRepository == null)
+                if (_loggerRepository == null)
                 {
-                    this.loggerRepository =
-                        LogManager.CreateRepository(this.options.LoggerRepository, repositoryType);
+                    _loggerRepository =
+                        LogManager.CreateRepository(_options.LoggerRepository, repositoryType);
                 }
             }
             else
             {
-                this.loggerRepository =
+                _loggerRepository =
                     LogManager.CreateRepository(assembly, repositoryType);
             }
 

@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Extensions.Logging
+﻿namespace Microsoft.Extensions.Logging.Log4Net
 {
     /// <summary>
     /// Represents a log level translator between the different logging systems.

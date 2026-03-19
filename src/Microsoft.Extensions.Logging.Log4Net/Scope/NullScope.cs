@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Microsoft.Extensions.Logging.Log4Net.AspNetCore.Scope
+namespace Microsoft.Extensions.Logging.Log4Net.Scope
 {
     /// <summary>
     /// A logger scope that does not save any information and does not need to be disposed.

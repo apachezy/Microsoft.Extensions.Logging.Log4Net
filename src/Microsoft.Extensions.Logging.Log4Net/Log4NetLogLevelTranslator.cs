@@ -1,7 +1,7 @@
-﻿using log4net.Core;
-using System;
+﻿using System;
+using log4net.Core;
 
-namespace Microsoft.Extensions.Logging
+namespace Microsoft.Extensions.Logging.Log4Net
 {
     /// <inheritdoc cref="ILog4NetLogLevelTranslator"/>
     public sealed class Log4NetLogLevelTranslator : ILog4NetLogLevelTranslator
@@ -13,7 +13,7 @@ namespace Microsoft.Extensions.Logging
             switch (logLevel)
             {
                 case LogLevel.Critical:
-                    string overrideCriticalLevelWith = options.OverrideCriticalLevelWith;
+                    var overrideCriticalLevelWith = options.OverrideCriticalLevelWith;
                     log4NetLevel = !string.IsNullOrEmpty(overrideCriticalLevelWith)
                             && overrideCriticalLevelWith.Equals(LogLevel.Critical.ToString(), StringComparison.OrdinalIgnoreCase)
                                 ? Level.Critical

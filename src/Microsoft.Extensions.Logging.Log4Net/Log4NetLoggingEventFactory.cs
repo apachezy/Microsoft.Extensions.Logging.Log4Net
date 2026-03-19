@@ -1,15 +1,14 @@
-﻿using log4net.Core;
-using Microsoft.Extensions.Logging.Log4Net.AspNetCore.Entities;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using log4net.Core;
+using Microsoft.Extensions.Logging.Log4Net.Entities;
 
-namespace Microsoft.Extensions.Logging
+namespace Microsoft.Extensions.Logging.Log4Net
 {
     /// <inheritdoc cref="ILog4NetLoggingEventFactory"/>
-    public class Log4NetLoggingEventFactory
-        : ILog4NetLoggingEventFactory
+    public class Log4NetLoggingEventFactory : ILog4NetLoggingEventFactory
     {
         private const string EventIdProperty = "eventId";
 
@@ -27,9 +26,9 @@ namespace Microsoft.Extensions.Logging
             Log4NetProviderOptions options,
             IExternalScopeProvider scopeProvider)
         {
-            Type callerStackBoundaryDeclaringType = typeof(LoggerExtensions);
-            string message = messageCandidate.Formatter(messageCandidate.State, messageCandidate.Exception);
-            Level logLevel = options.LogLevelTranslator.TranslateLogLevel(messageCandidate.LogLevel, options);
+            var callerStackBoundaryDeclaringType = typeof(LoggerExtensions);
+            var message = messageCandidate.Formatter(messageCandidate.State, messageCandidate.Exception);
+            var logLevel = options.LogLevelTranslator.TranslateLogLevel(messageCandidate.LogLevel, options);
 
             if (logLevel == null || (string.IsNullOrEmpty(message) && messageCandidate.Exception == null))
                 return null;
@@ -76,7 +75,7 @@ namespace Microsoft.Extensions.Logging
                 // Because string implements IEnumerable we first need to check for string.
                 if (scope is string)
                 {
-                    string previousValue = @event.Properties[DefaultScopeProperty] as string;
+                    var previousValue = @event.Properties[DefaultScopeProperty] as string;
 
                     @event.Properties[DefaultScopeProperty] = JoinOldAndNewValue(previousValue, scope.ToString());
                     return;
@@ -89,7 +88,7 @@ namespace Microsoft.Extensions.Logging
                         if (item is KeyValuePair<string, string>)
                         {
                             var keyValuePair = (KeyValuePair<string, string>)item;
-                            string previousValue = @event.Properties[keyValuePair.Key] as string;
+                            var previousValue = @event.Properties[keyValuePair.Key] as string;
                             @event.Properties[keyValuePair.Key] = JoinOldAndNewValue(previousValue, keyValuePair.Value);
                             continue;
                         }
@@ -97,14 +96,13 @@ namespace Microsoft.Extensions.Logging
                         if (item is KeyValuePair<string, object>)
                         {
                             var keyValuePair = (KeyValuePair<string, object>)item;
-                            string previousValue = @event.Properties[keyValuePair.Key] as string;
+                            var previousValue = @event.Properties[keyValuePair.Key] as string;
 
                             // The current culture should not influence how integers/floats/... are displayed in logging,
                             // so we are using Convert.ToString which will convert IConvertible and IFormattable with
                             // the specified IFormatProvider.
-                            string additionalValue = Convert.ToString(keyValuePair.Value, CultureInfo.InvariantCulture);
+                            var additionalValue = Convert.ToString(keyValuePair.Value, CultureInfo.InvariantCulture);
                             @event.Properties[keyValuePair.Key] = JoinOldAndNewValue(previousValue, additionalValue);
-                            continue;
                         }
                     }
                     return;
@@ -139,19 +137,20 @@ namespace Microsoft.Extensions.Logging
 
                 if (scope is object)
                 {
-                    string previousValue = @event.Properties[DefaultScopeProperty] as string;
-                    string additionalValue = Convert.ToString(scope, CultureInfo.InvariantCulture);
+                    var previousValue = @event.Properties[DefaultScopeProperty] as string;
+                    var additionalValue = Convert.ToString(scope, CultureInfo.InvariantCulture);
                     @event.Properties[DefaultScopeProperty] = JoinOldAndNewValue(previousValue, additionalValue);
-                    return;
                 }
+
+                return;
 
                 bool FromValueTuple<T>()
                 {
                     if (scope is ValueTuple<string, T>)
                     {
                         var valueTuple = (ValueTuple<string, T>)scope;
-                        string previousValue = @event.Properties[valueTuple.Item1] as string;
-                        string additionalValue = Convert.ToString(valueTuple.Item2, CultureInfo.InvariantCulture);
+                        var previousValue = @event.Properties[valueTuple.Item1] as string;
+                        var additionalValue = Convert.ToString(valueTuple.Item2, CultureInfo.InvariantCulture);
                         @event.Properties[valueTuple.Item1] = JoinOldAndNewValue(previousValue, additionalValue);
                         return true;
                     }

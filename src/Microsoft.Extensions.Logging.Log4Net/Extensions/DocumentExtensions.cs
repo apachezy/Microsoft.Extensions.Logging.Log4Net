@@ -2,7 +2,7 @@
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Microsoft.Extensions.Logging.Log4Net.AspNetCore.Extensions
+namespace Microsoft.Extensions.Logging.Log4Net.Extensions
 {
     /// <summary>
     /// Class with XmlDocument and XDocument extensions.

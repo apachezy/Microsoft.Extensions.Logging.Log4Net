@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.Logging.Log4Net.AspNetCore.Entities;
-using Microsoft.Extensions.Logging.Log4Net.AspNetCore.Scope;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging.Log4Net.Entities;
 
-namespace Microsoft.Extensions.Logging
+namespace Microsoft.Extensions.Logging.Log4Net
 {
     /// <summary>
     /// The log4Net provider options.
@@ -25,25 +24,17 @@ namespace Microsoft.Extensions.Logging
         /// <summary>
         /// Initializes a new instance of the <see cref="Log4NetProviderOptions"/> class.
         /// </summary>
-        /// <param name="log4NetConfigFileName">Name of the log4 net configuration file.</param>
-        public Log4NetProviderOptions(string log4NetConfigFileName)
-            : this(log4NetConfigFileName, false)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Log4NetProviderOptions"/> class.
-        /// </summary>
         /// <param name="log4NetConfigFileName">Name of the log4net configuration file.</param>
-        public Log4NetProviderOptions(string log4NetConfigFileName, bool watch)
+        /// <param name="watch">Whether to monitor the configuration file for changes.</param>
+        public Log4NetProviderOptions(string log4NetConfigFileName, bool watch = false)
         {
-            this.Log4NetConfigFileName = log4NetConfigFileName;
-            this.Watch = watch;
+            Log4NetConfigFileName = log4NetConfigFileName;
+            Watch = watch;
 
-            this.OverrideCriticalLevelWith = string.Empty;
-            this.Name = string.Empty;
-            this.PropertyOverrides = new List<NodeInfo>();
-            this.ExternalConfigurationSetup = false;
+            OverrideCriticalLevelWith = string.Empty;
+            Name = string.Empty;
+            PropertyOverrides = new List<NodeInfo>();
+            ExternalConfigurationSetup = false;
         }
 
         /// <summary>

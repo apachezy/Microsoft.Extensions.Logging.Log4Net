@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Microsoft.Extensions.Logging.Log4Net.AspNetCore.Entities
+namespace Microsoft.Extensions.Logging.Log4Net.Entities
 {
     /// <summary>
     /// Represents a candidate for a log message that should be printed. This candidate will either be accepted or denied by the logger that is trying to print it.
